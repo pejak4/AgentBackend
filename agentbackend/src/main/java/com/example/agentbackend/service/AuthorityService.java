@@ -1,4 +1,4 @@
-package com.example.demo.service;
+package com.example.agentbackend.service;
 
 import com.example.agentbackend.model.Authority;
 import com.example.agentbackend.repository.AuthorityRepository;
