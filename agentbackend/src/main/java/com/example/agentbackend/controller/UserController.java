@@ -1,5 +1,6 @@
 package com.example.agentbackend.controller;
 
+import com.example.agentbackend.service.AuthorityService;
 import com.example.agentbackend.view.UserLoginView;
 import com.example.agentbackend.view.UserTokenState;
 import com.example.agentbackend.common.TimeProvider;
@@ -21,11 +22,14 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RestController;
 
 import javax.naming.AuthenticationException;
 import java.util.List;
 
+@RestController
 public class UserController {
+
     @Autowired
     private TokenUtils tokenUtils;
 
@@ -39,7 +43,7 @@ public class UserController {
     private TimeProvider timeProvider;
 
     @Autowired
-    private com.example.demo.service.AuthorityService authorityService;
+    private AuthorityService authorityService;
 
     @Autowired
     private PasswordEncoder passwordEncoder;
