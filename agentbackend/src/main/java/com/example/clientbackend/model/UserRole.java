@@ -8,7 +8,7 @@ import javax.persistence.Enumerated;
 @Getter
 public enum UserRole {
 
-    ADMIN("ADMIN"), USER("USER");
+    ADMIN("ADMIN"), USER("USER"), AGENT("AGENT"), FIRM("FIRM");
 
     private String role;
 
