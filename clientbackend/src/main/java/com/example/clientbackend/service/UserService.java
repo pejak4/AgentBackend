@@ -4,13 +4,10 @@ import com.example.clientbackend.dto.UserLoginDto;
 import com.example.clientbackend.dto.UserRegistrationDto;
 import com.example.clientbackend.model.*;
 import com.example.clientbackend.repository.UserRepository;
-//import com.example.agentbackend.view.UserRegisterView;
 import com.example.clientbackend.security.TokenUtils;
 import com.example.clientbackend.view.UserTokenState;
 import javassist.NotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -62,7 +59,7 @@ public class UserService {
     public UserTokenState userLogin(UserLoginDto user) throws NotFoundException {
         User u = this.findOneByEmailAndPassword(user.getEmail(), user.getPassword());
         if (u == null)
-            return null;
+            throw new NotFoundException("Not existing user");
 
         List<Authority> auth = this.authorityService.findAllByRoleName(u.getRole().getRole());
         final Authentication authentication = authenticationManager
@@ -77,5 +74,14 @@ public class UserService {
         int expiresIn = tokenUtils.getExpiredIn();
 
         return new UserTokenState(jwt, (long) expiresIn, userToken.isFirstTimeLogged());
+    }
+
+    public boolean checkEmail(String email) {
+        User u = this.findOneByEmail(email);
+
+        if (u == null)
+            return false;
+        else
+            return true;
     }
 }
