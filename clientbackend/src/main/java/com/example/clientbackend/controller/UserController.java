@@ -1,11 +1,11 @@
 package com.example.clientbackend.controller;
 
+import com.example.clientbackend.dto.UserLoginDto;
+import com.example.clientbackend.dto.UserRegistrationDto;
+import com.example.clientbackend.model.User;
 import com.example.clientbackend.service.AuthorityService;
-import com.example.clientbackend.view.UserLoginView;
 import com.example.clientbackend.view.UserTokenState;
 import com.example.clientbackend.common.TimeProvider;
-import com.example.clientbackend.model.Authority;
-import com.example.clientbackend.model.User;
 import com.example.clientbackend.security.TokenUtils;
 import com.example.clientbackend.service.CustomUserDetailsService;
 import com.example.clientbackend.service.UserService;
@@ -15,16 +15,12 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.naming.AuthenticationException;
+import java.security.cert.X509Certificate;
+import java.util.ArrayList;
 import java.util.List;
 
 @RestController
@@ -55,24 +51,37 @@ public class UserController {
 
     @CrossOrigin(origins = "http://localhost:3000")
     @PostMapping(produces = MediaType.APPLICATION_JSON_VALUE, path = "/login")
-    public ResponseEntity<UserTokenState> login(@RequestBody UserLoginView user) throws AuthenticationException, NotFoundException {
+    public ResponseEntity<UserTokenState> login(@RequestBody UserLoginDto user) throws AuthenticationException, NotFoundException {
 
-        User u = this.userService.findOneByEmailAndPassword(user.getEmail(), user.getPassword());
-        if (u == null)
+        UserTokenState uts = userService.userLogin(user);
+
+        if (uts == null)
             return new ResponseEntity<>(HttpStatus.METHOD_NOT_ALLOWED);
 
-        List<Authority> auth = this.authorityService.findAllByRoleName(u.getRole().getRole());
-        final Authentication authentication = authenticationManager
-                .authenticate(new UsernamePasswordAuthenticationToken(user.getEmail(), user.getPassword(), auth));
+        return new ResponseEntity<>(uts, HttpStatus.OK);
+    }
 
-        //ubaci username(email) + password u kontext
-        SecurityContextHolder.getContext().setAuthentication(authentication);
+    @CrossOrigin(origins = "http://localhost:3000")
+    @PostMapping(produces = MediaType.APPLICATION_JSON_VALUE, path = "/registration")
+    public ResponseEntity<UserTokenState> registration(@RequestBody UserRegistrationDto user) throws NotFoundException {
 
-        //Kreiraj token
-        User userToken = (User) authentication.getPrincipal();
-        String jwt = tokenUtils.generateToken(userToken.getEmail(), userToken.getRole().getRole());
-        int expiresIn = tokenUtils.getExpiredIn();
+        userService.save(user);
 
-        return new ResponseEntity<>(new UserTokenState(jwt, (long) expiresIn, userToken.isFirstTimeLogged()), HttpStatus.OK);
+        return new ResponseEntity<>(HttpStatus.CREATED);
+    }
+
+    @CrossOrigin(origins = "http://localhost:3000")
+    @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE, path = "/email-check")
+    public ResponseEntity<?> checkEmail(@RequestBody String email){
+
+        User u = userService.findOneByEmail(email);
+
+        Boolean checkEmail;
+        if (u == null)
+            checkEmail = false;
+        else
+            checkEmail = true;
+
+        return new ResponseEntity<>(checkEmail, HttpStatus.OK);
     }
 }
