@@ -1,5 +1,6 @@
 package com.example.clientbackend.controller;
 
+import com.example.clientbackend.dto.UserCheckEmailDTO;
 import com.example.clientbackend.dto.UserLoginDto;
 import com.example.clientbackend.dto.UserRegistrationDto;
 import com.example.clientbackend.model.User;
@@ -17,11 +18,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
-
 import javax.naming.AuthenticationException;
-import java.security.cert.X509Certificate;
-import java.util.ArrayList;
-import java.util.List;
 
 @RestController
 public class UserController {
@@ -48,40 +45,21 @@ public class UserController {
     private UserService userService;
 
 
-
     @CrossOrigin(origins = "http://localhost:3000")
     @PostMapping(produces = MediaType.APPLICATION_JSON_VALUE, path = "/login")
-    public ResponseEntity<UserTokenState> login(@RequestBody UserLoginDto user) throws AuthenticationException, NotFoundException {
-
-        UserTokenState uts = userService.userLogin(user);
-
-        if (uts == null)
-            return new ResponseEntity<>(HttpStatus.METHOD_NOT_ALLOWED);
-
-        return new ResponseEntity<>(uts, HttpStatus.OK);
+    public ResponseEntity<UserTokenState> login(@RequestBody UserLoginDto user) throws NotFoundException {
+        return new ResponseEntity<>(this.userService.userLogin(user), HttpStatus.OK);
     }
 
     @CrossOrigin(origins = "http://localhost:3000")
     @PostMapping(produces = MediaType.APPLICATION_JSON_VALUE, path = "/registration")
-    public ResponseEntity<UserTokenState> registration(@RequestBody UserRegistrationDto user) throws NotFoundException {
-
-        userService.save(user);
-
-        return new ResponseEntity<>(HttpStatus.CREATED);
+    public ResponseEntity<?> registration(@RequestBody UserRegistrationDto user) {
+        return new ResponseEntity<>(this.userService.save(user), HttpStatus.CREATED);
     }
 
     @CrossOrigin(origins = "http://localhost:3000")
-    @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE, path = "/email-check")
-    public ResponseEntity<?> checkEmail(@RequestBody String email){
-
-        User u = userService.findOneByEmail(email);
-
-        Boolean checkEmail;
-        if (u == null)
-            checkEmail = false;
-        else
-            checkEmail = true;
-
-        return new ResponseEntity<>(checkEmail, HttpStatus.OK);
+    @PostMapping(produces = MediaType.APPLICATION_JSON_VALUE, path = "/email-check")
+    public ResponseEntity<?> checkEmail(@RequestBody UserCheckEmailDTO user){
+        return new ResponseEntity<>(this.userService.checkEmail(user.getEmail()), HttpStatus.OK);
     }
 }
