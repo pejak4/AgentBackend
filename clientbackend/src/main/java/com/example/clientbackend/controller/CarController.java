@@ -26,9 +26,6 @@ public class CarController {
         return new ResponseEntity<>(this.carService.findCarSearch(csd.getStartDate(), csd.getEndDate(), csd.getStartCity()), HttpStatus.OK);
     }
 
-    @CrossOrigin(origins = "http://localhost:3000")
-    @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE, path = "/getAllCars")
-    public ResponseEntity<?> getAllCars() {
-        return new ResponseEntity<>(this.carService.findAll(), HttpStatus.OK);
-    }
+
+
 }

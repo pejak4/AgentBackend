@@ -19,5 +19,4 @@ public class CarService {
         return listCarSearch;
     }
 
-    public List<Car> findAll(){return this.carRepository.findAll();}
 }
