@@ -3,7 +3,6 @@ package com.example.clientbackend.dto;
 import lombok.*;
 
 import java.sql.Timestamp;
-import java.util.Date;
 
 @Getter
 @Setter
