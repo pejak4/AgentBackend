@@ -19,6 +19,7 @@ public class Car {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    private String image;
     private String brand;
     private String model;
     private String fuelType;
@@ -26,6 +27,7 @@ public class Car {
     private String classCar;
     private double price;
     private int mileage;
+    private int plannedMileage;
     private Boolean CDW;
     private int capacitySeats;
     private int capacitySeatsForKids;
